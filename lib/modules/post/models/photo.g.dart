@@ -13,7 +13,9 @@ Photo _$PhotoFromJson(Map<String, dynamic> json) => Photo(
           : DateTime.parse(json['created_at'] as String),
       title: json['title'] as String?,
       description: json['description'] as String?,
-      image: json['image'],
+      image: json['image'] == null
+          ? null
+          : Picture.fromJson(json['image'] as Map<String, dynamic>),
       commentCounts: json['comment_counts'] as int?,
       likeCounts: json['like_counts'] as int?,
       collectionCounts: json['collection_counts'] as int?,

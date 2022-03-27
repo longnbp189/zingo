@@ -78,10 +78,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:zingoapp/modules/authentication/bloc/test/AuthRepository.dart';
 import 'package:zingoapp/modules/authentication/bloc/test/auth_bloc.dart';
-import 'package:zingoapp/modules/authentication/bloc/test/dash_board.dart';
-import 'package:zingoapp/modules/authentication/bloc/test/sign_in.dart';
+import 'package:zingoapp/modules/authentication/repos/auth_repo.dart';
+import 'package:zingoapp/modules/post/blocs/post_bloc.dart';
+import 'package:zingoapp/modules/post/blocs/story_bloc.dart';
+import 'package:zingoapp/modules/post/pages/home_page.dart';
+import 'package:zingoapp/modules/post/pages/welcome_page.dart';
+import 'package:zingoapp/modules/post/repos/post_repo.dart';
+import 'package:zingoapp/modules/post/repos/story_repo.dart';
+
+import 'modules/post/blocs/post_event.dart';
+import 'modules/post/blocs/story_event.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,25 +100,64 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        create: (context) => AuthBloc(
-          authRepository: RepositoryProvider.of<AuthRepository>(context),
-        ),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepo>(create: (context) => AuthRepo()),
+        RepositoryProvider<PostRepo>(create: (context) => PostRepo()),
+        RepositoryProvider<StoryRepo>(create: (context) => StoryRepo()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (BuildContext context) => AuthBloc(
+              authRepository: RepositoryProvider.of<AuthRepo>(context),
+            ),
+          ),
+          BlocProvider<PostBloc>(
+            create: (BuildContext context) => PostBloc(
+              postRepo: RepositoryProvider.of<PostRepo>(context),
+            ),
+          ),
+          BlocProvider<StoryBloc>(
+            create: (BuildContext context) => StoryBloc(
+              storyRepo: RepositoryProvider.of<StoryRepo>(context),
+            ),
+          )
+        ],
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           home: StreamBuilder<User?>(
               stream: FirebaseAuth.instance.authStateChanges(),
               builder: (context, snapshot) {
                 // If the snapshot has user data, then they're already signed in. So Navigating to the Dashboard.
                 if (snapshot.hasData) {
-                  return const Dashboard();
+                  _getStoryList(context);
+                  _getPostList(context);
+
+                  return const HomePage();
+                  // Navigator.pushReplacement(context,
+                  //     MaterialPageRoute(builder: (bcontext) {
+                  //   _getPostList(bcontext);
+                  //   return const HomePage();
+                  // }));
                 }
                 // Otherwise, they're not signed in. Show the sign in page.
-                return SignIn();
+                return const WelcomePage();
               }),
         ),
       ),
+    );
+  }
+
+  void _getPostList(context) {
+    BlocProvider.of<PostBloc>(context).add(
+      GetPostRequested(),
+    );
+  }
+
+  void _getStoryList(context) {
+    BlocProvider.of<StoryBloc>(context).add(
+      GetStoryRequested(),
     );
   }
 }

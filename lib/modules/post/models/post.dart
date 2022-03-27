@@ -1,5 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:zingoapp/modules/post/models/photo.dart';
+import 'package:zingoapp/modules/post/models/picture.dart';
+import 'package:zingoapp/modules/post/models/user.dart';
 
 part 'post.g.dart';
 
@@ -25,6 +28,10 @@ class Post {
   final bool? liked;
   @JsonKey(name: 'user', includeIfNull: false)
   final User? user;
+  @JsonKey(name: 'images', includeIfNull: false)
+  final List<Picture>? images;
+  @JsonKey(name: 'photos', includeIfNull: false)
+  final List<Photo>? photos;
 
   Post(
       {this.id,
@@ -36,9 +43,18 @@ class Post {
       this.commentCounts,
       this.likeCounts,
       this.liked,
-      this.user});
+      this.user,
+      this.images,
+      this.photos});
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
 
   Map<String, dynamic> toJson() => _$PostToJson(this);
+}
+
+String parseDate(String? datetime) {
+  DateTime dt = DateTime.parse(datetime!);
+  String formattedDate = DateFormat('dd/MM/yyyy').format(dt);
+
+  return formattedDate;
 }

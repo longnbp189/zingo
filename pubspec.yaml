@@ -45,6 +45,7 @@ dependencies:
   equatable: ^2.0.3
   flutter_bloc: ^8.0.0
   email_validator: ^2.0.0
+  font_awesome_flutter: ^10.1.0
 
 dev_dependencies:
   flutter_test:

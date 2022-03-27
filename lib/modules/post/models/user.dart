@@ -1,4 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:zingoapp/modules/post/models/avatar.dart';
+import 'package:zingoapp/modules/post/models/profile.dart';
 
 part 'user.g.dart';
 
@@ -13,7 +15,9 @@ class User {
   @JsonKey(name: 'last_name')
   final String? lastName;
   @JsonKey(name: 'avatar')
-  final String? avatar;
+  final Avatar? avatar;
+  @JsonKey(name: 'profile')
+  final Profile? profile;
   @JsonKey(name: 'access_token')
   final String? accessToken;
 
@@ -23,6 +27,7 @@ class User {
       this.firstName,
       this.lastName,
       this.avatar,
+      this.profile,
       this.accessToken});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
